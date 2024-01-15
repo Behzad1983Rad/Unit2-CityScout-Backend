@@ -25,8 +25,7 @@ const tripSchema = new mongoose.Schema({
     destination: String,
     dateOfArrival: Number,
     duration: Number,
-    cost: Number,
-    
+    cost: Number
 })
 
 const userSchema = new mongoose.Schema({
