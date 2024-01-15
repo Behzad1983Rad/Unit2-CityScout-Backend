@@ -25,7 +25,9 @@ const tripSchema = new mongoose.Schema({
     destination: String,
     dateOfArrival: Number,
     duration: Number,
-    cost: Number
+    cost: Number,
+    
+    
 })
 
 const userSchema = new mongoose.Schema({
@@ -48,7 +50,10 @@ app.get('/trip', async (req, res) => {
 })
 
 app.post('/trip/new', (req, res) => {
-    const myTrip = new Trip(req.body)
+    
+    const myTrip = new Trip(req.body);
+
+   
     myTrip.save()
     .then(() => {
         console.log("Trip Saved")
