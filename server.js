@@ -26,6 +26,10 @@ const tripSchema = new mongoose.Schema({
     dateOfArrival: Number,
     duration: Number,
     cost: Number,
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }
     
     
 })
@@ -35,7 +39,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    lastLogin: {
+    lastLogin: { 
         type: Date,
         required: true
     }
@@ -44,31 +48,63 @@ const userSchema = new mongoose.Schema({
 const Trip = mongoose.model('Trip', tripSchema)
 const User = mongoose.model('User', userSchema)
 
+// app.get('/trip', async (req, res) => {
+//     const allTrips = await Trip.find({})
+//     res.json(allTrips)
+// })
+
+
+
 app.get('/trip', async (req, res) => {
-    const allTrips = await Trip.find({})
-    res.json(allTrips)
-})
+    const userEmail = req.headers['user-email'];
+    const user = await User.findOne({ userEmail });
 
-app.post('/trip/new', (req, res) => {
-    
-    const myTrip = new Trip(req.body);
+    if (user) {
+        console.log(user)
+        const userTrips = await Trip.find({ user }).populate('user');
+        res.json(userTrips);
+    } else {
+        console.log('Not found')
+        res.status(404).json({ message: "User not found" });
+    }
+});
 
-   
-    myTrip.save()
-    .then(() => {
-        console.log("Trip Saved")
-        res.sendStatus(200)
-    })
-    .catch((error) => {
-        console.error("Error saving trip:", error);
-        res.sendStatus(500);
-    });
-})
+app.post('/trip/new', async (req, res) => {
+    const userEmail = req.headers['user-email'];
+    const user = await User.findOne({ userEmail });
+    console.log(userEmail)
+
+    if (user) {
+        const myTrip = new Trip({
+            destination: req.body.destination,
+            dateOfArrival: req.body.dateOfArrival,
+            duration: req.body.duration,
+            cost: req.body.cost,
+            user: user
+        });
+
+        myTrip.save()
+            .then(() => {
+                console.log("Trip Saved");
+                res.sendStatus(200);
+            })
+            .catch((error) => {
+                console.error("Error saving trip:", error);
+                res.sendStatus(500);
+            });
+    } else {
+        res.status(404).json({ message: "User not found" });
+    }
+});
+
+
+
 
 app.get('/trip/:id', async (req, res) =>{
     const trip = await Trip.findById(req.params.id)
     res.json(trip)
 })
+
 
 
 
@@ -115,4 +151,8 @@ app.post('/user/login' , async (req, res) => {
         res.sendStatus(200)
     }
 })
+
+
+
+
 
