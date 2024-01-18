@@ -31,9 +31,9 @@ router.get('/countries', async (req, res) => {
     }
   });
 
-// router.get('/', (req, res) => {
-//     res.json({message: "Server running"})
-// })
+router.get('/', (req, res) => {
+    res.json({message: "Server running"})
+})
 
 mongoose.connect(process.env.DATABASE_URL)
 
