@@ -16,10 +16,10 @@ api.use(bodyParser.json())
 
 const holidayApi = new HolidayAPI({ key })
 
-const routher = Router()
+const router = Router()
 
 
-routher.get('/countries', async (req, res) => {
+router.get('/countries', async (req, res) => {
     const searchString = req.query.search
     try {
       const countries = await holidayApi.countries({
@@ -35,7 +35,7 @@ routher.get('/countries', async (req, res) => {
 
 
 
-routher.get('/', (req, res) => {
+router.get('/', (req, res) => {
     res.json({message: "Server running"})
 })
 
@@ -72,7 +72,7 @@ const User = mongoose.model('User', userSchema)
 
 
 
-routher.get('/trip', async (req, res) => {
+router.get('/trip', async (req, res) => {
     const userEmail = req.headers['user-email'];
     const user = await User.findOne({ userEmail });
 
@@ -86,7 +86,7 @@ routher.get('/trip', async (req, res) => {
     }
 });
 
-routher.post('/trip/new', async (req, res) => {
+router.post('/trip/new', async (req, res) => {
     const userEmail = req.headers['user-email'];
     const user = await User.findOne({ userEmail });
     console.log(userEmail)
@@ -117,7 +117,7 @@ routher.post('/trip/new', async (req, res) => {
 
 
 
-routher.get('/trip/:id', async (req, res) =>{
+router.get('/trip/:id', async (req, res) =>{
     const trip = await Trip.findById(req.params.id)
     res.json(trip)
 })
@@ -125,7 +125,7 @@ routher.get('/trip/:id', async (req, res) =>{
 
 
 
-routher.put('/trip/:id' , (req, res)=> {
+router.put('/trip/:id' , (req, res)=> {
     Trip.updateOne({"_id": req.params.id}, { destination: req.body.destination, dateOfArrival: req.body.dateOfArrival, 
         duration: req.body.duration, cost: req.body.cost })
     .then(() => {
@@ -136,7 +136,7 @@ routher.put('/trip/:id' , (req, res)=> {
     })
 })
 
-routher.delete('/trip/:id' , (req, res) =>{
+router.delete('/trip/:id' , (req, res) =>{
     Trip.deleteOne({"_id": req.params.id})
     .then(() => {
         res.sendStatus(200)
@@ -147,7 +147,7 @@ routher.delete('/trip/:id' , (req, res) =>{
 })
 
 
-routher.post('/user/login' , async (req, res) => {
+router.post('/user/login' , async (req, res) => {
     const now = new Date()
 
     if (await User.countDocuments({"userEmail" : req.body.userEmail}) === 0) {
