@@ -11,7 +11,7 @@ const api = express()
 api.use(cors())
 api.use(bodyParser.json())
 
-// const key = process.env.HOLIDAY_API_KEY;
+const key = process.env.HOLIDAY_API_KEY;
 
 const holidayApi = new HolidayAPI({ key })
 
