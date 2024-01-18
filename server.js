@@ -4,12 +4,32 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose'
 
-const app = express()
+import { HolidayAPI } from 'holidayapi';
 
+
+const app = express()
 app.use(cors())
 app.use(bodyParser.json())
-
 const port = process.env.PORT || 4000
+
+const key = process.env.HOLIDAY_API_KEY;
+
+const holidayApi = new HolidayAPI({ key })
+
+
+app.get('/countries', async (req, res) => {
+    const searchString = req.query.search
+    try {
+      const countries = await holidayApi.countries({
+        search: searchString
+      });
+      res.json(countries);
+    } catch (error) {
+      console.error('Error fetching countries:', error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
+
 
 app.listen(port, () => {
     console.log(`Listenig on port: ${port}`)
@@ -48,10 +68,7 @@ const userSchema = new mongoose.Schema({
 const Trip = mongoose.model('Trip', tripSchema)
 const User = mongoose.model('User', userSchema)
 
-// app.get('/trip', async (req, res) => {
-//     const allTrips = await Trip.find({})
-//     res.json(allTrips)
-// })
+
 
 
 
