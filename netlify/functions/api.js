@@ -6,9 +6,10 @@ import mongoose from 'mongoose'
 import serverless from 'serverless-http'
 import { HolidayAPI } from 'holidayapi'
 
-
+const corsOptions = {origin:"https://ubiquitous-marshmallow-6c35d8.netlify.app/" ,
+optionsSuccessStatus:200}
 const api = express()
-api.use(cors());
+api.use(cors(corsOptions));
 
 
 api.use(bodyParser.json())
