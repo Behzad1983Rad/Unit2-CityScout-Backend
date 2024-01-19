@@ -8,7 +8,9 @@ import { HolidayAPI } from 'holidayapi'
 
 
 const api = express()
-api.use(cors())
+api.use(cors());
+
+
 api.use(bodyParser.json())
 
 const key = process.env.HOLIDAY_API_KEY;
@@ -167,8 +169,3 @@ router.post('/user/login' , async (req, res) => {
 
 api.use("/api/" , router)
 export const handler = serverless(api)
-
-
-
-
-
