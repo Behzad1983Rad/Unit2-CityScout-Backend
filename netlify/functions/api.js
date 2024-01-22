@@ -8,8 +8,7 @@ import { HolidayAPI } from 'holidayapi'
 
 
 const api = express()
-api.options('*', cors())
-// api.use(cors());
+api.use(cors());
 
 
 api.use(bodyParser.json())
