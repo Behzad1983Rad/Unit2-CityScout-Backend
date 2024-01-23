@@ -6,10 +6,8 @@ import mongoose from 'mongoose'
 import serverless from 'serverless-http'
 import { HolidayAPI } from 'holidayapi'
 
-
 const api = express()
 api.use(cors());
-
 
 api.use(bodyParser.json())
 
@@ -18,24 +16,6 @@ const key = process.env.HOLIDAY_API_KEY;
 const holidayApi = new HolidayAPI({ key })
 
 const router = Router()
-
-
-router.get('/countries', async (req, res) => {
-    const searchString = req.query.search
-    try {
-      const countries = await holidayApi.countries({
-        search: searchString
-      });
-      res.json(countries);
-    } catch (error) {
-      console.error('Error fetching countries:', error.message);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
-
-router.get('/', (req, res) => {
-    res.json({message: "Server running"})
-})
 
 mongoose.connect(process.env.DATABASE_URL)
 
@@ -47,9 +27,7 @@ const tripSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }
-    
-    
+    }   
 })
 
 const userSchema = new mongoose.Schema({
@@ -66,9 +44,22 @@ const userSchema = new mongoose.Schema({
 const Trip = mongoose.model('Trip', tripSchema)
 const User = mongoose.model('User', userSchema)
 
+router.get('/', (req, res) => {
+    res.json({message: "Server running"})
+})
 
-
-
+router.get('/countries', async (req, res) => {
+    const searchString = req.query.search
+    try {
+      const countries = await holidayApi.countries({
+        search: searchString
+      });
+      res.json(countries);
+    } catch (error) {
+      console.error('Error fetching countries:', error.message);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
 
 router.get('/trip', async (req, res) => {
     const userEmail = req.headers['user-email'];
@@ -112,16 +103,10 @@ router.post('/trip/new', async (req, res) => {
     }
 });
 
-
-
-
 router.get('/trip/:id', async (req, res) =>{
     const trip = await Trip.findById(req.params.id)
     res.json(trip)
 })
-
-
-
 
 router.put('/trip/:id' , (req, res)=> {
     Trip.updateOne({"_id": req.params.id}, { destination: req.body.destination, dateOfArrival: req.body.dateOfArrival, 
@@ -143,7 +128,6 @@ router.delete('/trip/:id' , (req, res) =>{
         res.sendStatus(500)
     })
 })
-
 
 router.post('/user/login' , async (req, res) => {
     const now = new Date()
