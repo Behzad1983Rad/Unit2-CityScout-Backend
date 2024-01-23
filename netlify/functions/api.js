@@ -71,7 +71,7 @@ router.get('/trip', async (req, res) => {
         res.json(userTrips);
     } else {
         console.log('Not found')
-        res.status(404).json({ message: "User not found" });
+        res.status(404).json({ message: "User not found" });        
     }
 });
 

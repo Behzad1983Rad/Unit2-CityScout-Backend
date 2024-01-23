@@ -84,6 +84,7 @@ app.get('/trip', async (req, res) => {
         console.log('Not found')
         res.status(404).json({ message: "User not found" });
     }
+
 });
 
 app.post('/trip/new', async (req, res) => {
