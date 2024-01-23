@@ -1,3 +1,4 @@
+// imports
 import 'dotenv/config'
 import express , {Router} from 'express'
 import cors from 'cors'
@@ -6,19 +7,20 @@ import mongoose from 'mongoose'
 import serverless from 'serverless-http'
 import { HolidayAPI } from 'holidayapi'
 
+// constants
 const api = express()
-api.use(cors());
-
-api.use(bodyParser.json())
-
 const key = process.env.HOLIDAY_API_KEY;
-
 const holidayApi = new HolidayAPI({ key })
-
 const router = Router()
 
+// express config
+api.use(cors());
+api.use(bodyParser.json())
+
+// Mongo connection
 mongoose.connect(process.env.DATABASE_URL)
 
+// Mongo Schemas
 const tripSchema = new mongoose.Schema({
     destination: String,
     dateOfArrival: Number,
@@ -27,7 +29,7 @@ const tripSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }   
+    }
 })
 
 const userSchema = new mongoose.Schema({
@@ -35,15 +37,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    lastLogin: { 
+    lastLogin: {
         type: Date,
         required: true
     }
 })
 
+// Mongo models
 const Trip = mongoose.model('Trip', tripSchema)
 const User = mongoose.model('User', userSchema)
 
+// Endpoints
 router.get('/', (req, res) => {
     res.json({message: "Server running"})
 })
@@ -61,17 +65,16 @@ router.get('/countries', async (req, res) => {
     }
   });
 
-router.get('/trip', async (req, res) => {
+  router.get('/trip', async (req, res) => {
     const userEmail = req.headers['user-email'];
     const user = await User.findOne({ userEmail });
-
     if (user) {
         console.log(user)
         const userTrips = await Trip.find({ user }).populate('user');
         res.json(userTrips);
     } else {
         console.log('Not found')
-        res.status(404).json({ message: "User not found" });        
+        res.status(404).json({ message: "User not found" });
     }
 });
 
@@ -79,7 +82,6 @@ router.post('/trip/new', async (req, res) => {
     const userEmail = req.headers['user-email'];
     const user = await User.findOne({ userEmail });
     console.log(userEmail)
-
     if (user) {
         const myTrip = new Trip({
             destination: req.body.destination,
@@ -88,7 +90,6 @@ router.post('/trip/new', async (req, res) => {
             cost: req.body.cost,
             user: user
         });
-
         myTrip.save()
             .then(() => {
                 console.log("Trip Saved");
@@ -109,7 +110,7 @@ router.get('/trip/:id', async (req, res) =>{
 })
 
 router.put('/trip/:id' , (req, res)=> {
-    Trip.updateOne({"_id": req.params.id}, { destination: req.body.destination, dateOfArrival: req.body.dateOfArrival, 
+    Trip.updateOne({"_id": req.params.id}, { destination: req.body.destination, dateOfArrival: req.body.dateOfArrival,
         duration: req.body.duration, cost: req.body.cost })
     .then(() => {
         res.sendStatus(200)
@@ -131,7 +132,6 @@ router.delete('/trip/:id' , (req, res) =>{
 
 router.post('/user/login' , async (req, res) => {
     const now = new Date()
-
     if (await User.countDocuments({"userEmail" : req.body.userEmail}) === 0) {
         const newUser = new User({
             userEmail: req.body.userEmail,
@@ -151,5 +151,8 @@ router.post('/user/login' , async (req, res) => {
     }
 })
 
+// API connection to router
 api.use("/api/" , router)
+
+// Export for usage
 export const handler = serverless(api)
