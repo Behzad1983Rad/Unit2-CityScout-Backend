@@ -8,7 +8,10 @@ import { HolidayAPI } from 'holidayapi';
 
 
 const app = express()
-app.use(cors())
+app.use(cors({
+    origin: "https://behzad1983rad-unit2-frontend-production.up.railway.app",
+    methods: "GET, HEAD, PUT, PATCH, POST, DELETE"
+}))
 app.use(bodyParser.json())
 const port = process.env.PORT || 4000
 
